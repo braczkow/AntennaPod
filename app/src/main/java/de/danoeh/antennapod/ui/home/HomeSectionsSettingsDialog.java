@@ -4,13 +4,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import de.danoeh.antennapod.R;
 
 import java.util.List;
 
 public class HomeSectionsSettingsDialog {
-    public static void open(Context context, DialogInterface.OnClickListener onSettingsChanged) {
+    public static AlertDialog open(
+            Context context,
+            DialogInterface.OnClickListener onSettingsChanged,
+            DialogInterface.OnClickListener onDialogDismiss
+    ) {
         final List<String> hiddenSections = HomeFragment.getHiddenSections(context);
         String[] sectionLabels = context.getResources().getStringArray(R.array.home_section_titles);
         String[] sectionTags = context.getResources().getStringArray(R.array.home_section_tags);
@@ -36,7 +43,10 @@ public class HomeSectionsSettingsDialog {
             prefs.edit().putString(HomeFragment.PREF_HIDDEN_SECTIONS, TextUtils.join(",", hiddenSections)).apply();
             onSettingsChanged.onClick(dialog, which);
         });
-        builder.setNegativeButton(R.string.cancel_label, null);
-        builder.create().show();
+        builder.setNegativeButton(R.string.cancel_label, onDialogDismiss);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        return dialog;
     }
 }
