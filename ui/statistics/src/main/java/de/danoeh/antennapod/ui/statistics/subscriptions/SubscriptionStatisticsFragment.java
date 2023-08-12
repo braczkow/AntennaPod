@@ -1,5 +1,6 @@
 package de.danoeh.antennapod.ui.statistics.subscriptions;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.event.StatisticsEvent;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 import de.danoeh.antennapod.ui.statistics.R;
 import de.danoeh.antennapod.ui.statistics.StatisticsFragment;
 import io.reactivex.Observable;
@@ -32,7 +34,7 @@ import java.util.Collections;
 /**
  * Displays the 'playback statistics' screen
  */
-public class SubscriptionStatisticsFragment extends Fragment {
+public class SubscriptionStatisticsFragment extends Fragment implements ConfigurationChangedHandler {
     private static final String TAG = SubscriptionStatisticsFragment.class.getSimpleName();
 
     private Disposable disposable;
@@ -40,6 +42,8 @@ public class SubscriptionStatisticsFragment extends Fragment {
     private ProgressBar progressBar;
     private PlaybackStatisticsListAdapter listAdapter;
     private DBReader.StatisticsResult statisticsResult;
+
+    private Dialog dialog = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,11 +96,17 @@ public class SubscriptionStatisticsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.statistics_filter) {
             if (statisticsResult != null) {
-                new StatisticsFilterDialog(getContext(), statisticsResult.oldestDate).show();
+                showStatisticsFilterDialog();
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showStatisticsFilterDialog() {
+        dialog = new StatisticsFilterDialog(getContext(), statisticsResult.oldestDate).show(() -> {
+            dialog = null;
+        });
     }
 
     private void refreshStatistics() {
@@ -133,5 +143,13 @@ public class SubscriptionStatisticsFragment extends Fragment {
                     progressBar.setVisibility(View.GONE);
                     feedStatisticsList.setVisibility(View.VISIBLE);
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
+    }
+
+    @Override
+    public void handleConfigurationChanged() {
+        if (dialog != null) {
+            dialog.dismiss();
+            showStatisticsFilterDialog();
+        }
     }
 }

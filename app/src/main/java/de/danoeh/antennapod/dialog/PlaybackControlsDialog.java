@@ -18,7 +18,7 @@ import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 
 import java.util.List;
 
-public class PlaybackControlsDialog extends DialogFragment implements ConfigurationChangedHandler {
+public class PlaybackControlsDialog extends DialogFragment {
     private PlaybackController controller;
     private AlertDialog dialog;
 
@@ -88,13 +88,5 @@ public class PlaybackControlsDialog extends DialogFragment implements Configurat
             controller.setAudioTrack((selectedAudioTrack + 1) % audioTracks.size());
             new Handler(Looper.getMainLooper()).postDelayed(this::setupAudioTracks, 500);
         });
-    }
-
-    @Override
-    public void handleConfigurationChanged() {
-        if (dialog != null) {
-            dialog.dismiss();
-            onCreateDialog(null).show();
-        }
     }
 }

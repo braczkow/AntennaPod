@@ -1,5 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -569,9 +571,24 @@ public class AudioPlayerFragment extends Fragment implements
     @Override
     public void handleConfigurationChanged() {
         for (Fragment f : getChildFragmentManager().getFragments()) {
-            if (f instanceof ConfigurationChangedHandler) {
-                ((ConfigurationChangedHandler) f).handleConfigurationChanged();
+            if (f instanceof SleepTimerDialog) {
+                ((SleepTimerDialog) f).dismiss();
+                new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
+            } else if (f instanceof PlaybackControlsDialog) {
+                ((PlaybackControlsDialog) f).dismiss();
+                PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance();
+                dialog.show(getChildFragmentManager(), "playback_controls");
             }
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 }

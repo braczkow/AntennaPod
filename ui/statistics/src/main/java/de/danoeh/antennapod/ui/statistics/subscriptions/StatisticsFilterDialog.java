@@ -1,5 +1,6 @@
 package de.danoeh.antennapod.ui.statistics.subscriptions;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class StatisticsFilterDialog {
         filterDatesTo = makeMonthlyList(oldestDate, true);
     }
 
-    public void show() {
+    public Dialog show(Runnable postDialogAction) {
         StatisticsFilterDialogBinding dialogBinding = StatisticsFilterDialogBinding.inflate(
                 LayoutInflater.from(context));
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
@@ -100,8 +101,17 @@ public class StatisticsFilterDialog {
                     .putLong(StatisticsFragment.PREF_FILTER_TO, timeFilterTo)
                     .apply();
             EventBus.getDefault().post(new StatisticsEvent());
+
+            postDialogAction.run();
         });
-        builder.show();
+
+        builder.setOnDismissListener((DialogInterface)-> {
+            postDialogAction.run();
+        });
+
+        Dialog result = builder.create();
+        result.show();
+        return result;
     }
 
     private Pair<String[], Long[]> makeMonthlyList(long oldestDate, boolean inclusive) {
