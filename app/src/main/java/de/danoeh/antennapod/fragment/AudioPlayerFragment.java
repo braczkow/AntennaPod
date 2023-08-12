@@ -581,14 +581,4 @@ public class AudioPlayerFragment extends Fragment implements
             }
         }
     }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 }

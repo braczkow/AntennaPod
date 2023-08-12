@@ -14,7 +14,6 @@ import android.widget.CheckBox;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.core.util.playback.PlaybackController;
-import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 
 import java.util.List;
 

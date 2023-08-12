@@ -109,11 +109,8 @@ public class SleepTimerDialog extends DialogFragment implements ConfigurationCha
         etxtTime.setText(SleepTimerPreferences.lastTimerValue());
         etxtTime.postDelayed(() -> {
             Context context = getContext();
-            if (context != null) {
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(etxtTime, InputMethodManager.SHOW_IMPLICIT);
-            } else {
-            }
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(etxtTime, InputMethodManager.SHOW_IMPLICIT);
         }, 100);
 
         final CheckBox cbShakeToReset = content.findViewById(R.id.cbShakeToReset);
@@ -140,8 +137,7 @@ public class SleepTimerDialog extends DialogFragment implements ConfigurationCha
         changeTimesButton.setOnClickListener(changeTimesBtn -> {
             int from = SleepTimerPreferences.autoEnableFrom();
             int to = SleepTimerPreferences.autoEnableTo();
-            Context context = getActivity();
-            showTimeRangeDialog(context, from, to);
+            showTimeRangeDialog(getContext(), from, to);
         });
 
         Button disableButton = content.findViewById(R.id.disableSleeptimerButton);
@@ -227,20 +223,5 @@ public class SleepTimerDialog extends DialogFragment implements ConfigurationCha
             dialog.dismiss();
             onCreateDialog(null).show();
         }
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 }
