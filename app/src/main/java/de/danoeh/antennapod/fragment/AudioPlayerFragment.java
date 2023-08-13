@@ -1,5 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -61,6 +63,7 @@ import de.danoeh.antennapod.dialog.SkipPreferenceDialog;
 import de.danoeh.antennapod.dialog.SleepTimerDialog;
 import de.danoeh.antennapod.dialog.VariableSpeedDialog;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 import de.danoeh.antennapod.ui.common.PlaybackSpeedIndicatorView;
 import de.danoeh.antennapod.view.ChapterSeekBar;
 import de.danoeh.antennapod.view.PlayButton;
@@ -73,7 +76,7 @@ import io.reactivex.schedulers.Schedulers;
  * Shows the audio player.
  */
 public class AudioPlayerFragment extends Fragment implements
-        ChapterSeekBar.OnSeekBarChangeListener, MaterialToolbar.OnMenuItemClickListener {
+        ChapterSeekBar.OnSeekBarChangeListener, MaterialToolbar.OnMenuItemClickListener, ConfigurationChangedHandler {
     public static final String TAG = "AudioPlayerFragment";
     public static final int POS_COVER = 0;
     public static final int POS_DESCRIPTION = 1;
@@ -563,5 +566,19 @@ public class AudioPlayerFragment extends Fragment implements
 
     public void scrollToPage(int page) {
         scrollToPage(page, false);
+    }
+
+    @Override
+    public void handleConfigurationChanged() {
+        for (Fragment f : getChildFragmentManager().getFragments()) {
+            if (f instanceof SleepTimerDialog) {
+                ((SleepTimerDialog) f).dismiss();
+                new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
+            } else if (f instanceof PlaybackControlsDialog) {
+                ((PlaybackControlsDialog) f).dismiss();
+                PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance();
+                dialog.show(getChildFragmentManager(), "playback_controls");
+            }
+        }
     }
 }

@@ -60,6 +60,7 @@ import de.danoeh.antennapod.net.download.serviceinterface.DownloadServiceInterfa
 import de.danoeh.antennapod.playback.cast.CastEnabledActivity;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 import de.danoeh.antennapod.ui.common.ThemeUtils;
 import de.danoeh.antennapod.ui.home.HomeFragment;
 import de.danoeh.antennapod.view.LockableBottomSheetBehavior;
@@ -457,7 +458,9 @@ public class MainActivity extends CastEnabledActivity {
         if (drawerToggle != null) { // Tablet layout does not have a drawer
             drawerToggle.onConfigurationChanged(newConfig);
         }
+
         setNavDrawerSize();
+        handleOnConfigurationChanged();
     }
 
     private void setNavDrawerSize() {
@@ -469,6 +472,15 @@ public class MainActivity extends CastEnabledActivity {
         int maxWidth = (int) getResources().getDimension(R.dimen.nav_drawer_max_screen_size);
 
         navDrawer.getLayoutParams().width = Math.min(width, maxWidth);
+    }
+
+    private void handleOnConfigurationChanged() {
+        FragmentManager fm = getSupportFragmentManager();
+        for (Fragment f: fm.getFragments()) {
+            if (f instanceof ConfigurationChangedHandler) {
+                ((ConfigurationChangedHandler) f).handleConfigurationChanged();
+            }
+        }
     }
 
     private int getScreenWidth() {

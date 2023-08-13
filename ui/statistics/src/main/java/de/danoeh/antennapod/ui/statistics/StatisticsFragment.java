@@ -20,6 +20,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.event.StatisticsEvent;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 import de.danoeh.antennapod.ui.common.PagedToolbarFragment;
 import de.danoeh.antennapod.ui.statistics.downloads.DownloadStatisticsFragment;
 import de.danoeh.antennapod.ui.statistics.subscriptions.SubscriptionStatisticsFragment;
@@ -33,7 +34,7 @@ import org.greenrobot.eventbus.EventBus;
 /**
  * Displays the 'statistics' screen
  */
-public class StatisticsFragment extends PagedToolbarFragment {
+public class StatisticsFragment extends PagedToolbarFragment implements ConfigurationChangedHandler {
     public static final String TAG = "StatisticsFragment";
     public static final String PREF_NAME = "StatisticsActivityPrefs";
     public static final String PREF_INCLUDE_MARKED_PLAYED = "countAll";
@@ -145,6 +146,15 @@ public class StatisticsFragment extends PagedToolbarFragment {
         @Override
         public int getItemCount() {
             return TOTAL_COUNT;
+        }
+    }
+
+    @Override
+    public void handleConfigurationChanged() {
+        for (Fragment f : getChildFragmentManager().getFragments()) {
+            if (f instanceof ConfigurationChangedHandler) {
+                ((ConfigurationChangedHandler) f).handleConfigurationChanged();
+            }
         }
     }
 }

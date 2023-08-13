@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.core.util.playback.PlaybackController;
+
 import java.util.List;
 
 public class PlaybackControlsDialog extends DialogFragment {

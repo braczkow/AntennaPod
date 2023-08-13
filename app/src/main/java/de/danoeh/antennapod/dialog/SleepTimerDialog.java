@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -31,14 +33,17 @@ import de.danoeh.antennapod.core.service.playback.PlaybackService;
 import de.danoeh.antennapod.core.util.Converter;
 import de.danoeh.antennapod.core.util.playback.PlaybackController;
 import de.danoeh.antennapod.event.playback.SleepTimerUpdatedEvent;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 
-public class SleepTimerDialog extends DialogFragment {
+public class SleepTimerDialog extends DialogFragment implements ConfigurationChangedHandler {
     private PlaybackController controller;
     private EditText etxtTime;
     private LinearLayout timeSetup;
     private LinearLayout timeDisplay;
     private TextView time;
     private CheckBox chAutoEnable;
+
+    private AlertDialog dialog = null;
 
     public SleepTimerDialog() {
 
@@ -103,7 +108,8 @@ public class SleepTimerDialog extends DialogFragment {
 
         etxtTime.setText(SleepTimerPreferences.lastTimerValue());
         etxtTime.postDelayed(() -> {
-            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            Context context = getContext();
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(etxtTime, InputMethodManager.SHOW_IMPLICIT);
         }, 100);
 
@@ -161,7 +167,9 @@ public class SleepTimerDialog extends DialogFragment {
                 Snackbar.make(content, R.string.time_dialog_invalid_input, Snackbar.LENGTH_LONG).show();
             }
         });
-        return builder.create();
+
+        dialog = builder.create();
+        return dialog;
     }
 
     private void showTimeRangeDialog(Context context, int from, int to) {
@@ -207,5 +215,13 @@ public class SleepTimerDialog extends DialogFragment {
     private void closeKeyboard(View content) {
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(content.getWindowToken(), 0);
+    }
+
+    @Override
+    public void handleConfigurationChanged() {
+        if (dialog != null) {
+            dialog.dismiss();
+            onCreateDialog(null).show();
+        }
     }
 }

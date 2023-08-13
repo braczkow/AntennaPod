@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -39,6 +40,7 @@ import de.danoeh.antennapod.event.FeedListUpdateEvent;
 import de.danoeh.antennapod.event.FeedUpdateRunningEvent;
 import de.danoeh.antennapod.fragment.SearchFragment;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
+import de.danoeh.antennapod.ui.common.ConfigurationChangedHandler;
 import de.danoeh.antennapod.ui.home.sections.AllowNotificationsSection;
 import de.danoeh.antennapod.ui.home.sections.DownloadsSection;
 import de.danoeh.antennapod.ui.home.sections.EpisodesSurpriseSection;
@@ -54,14 +56,14 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Shows unread or recently published episodes
  */
-public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
+public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickListener, ConfigurationChangedHandler {
 
     public static final String TAG = "HomeFragment";
     public static final String PREF_NAME = "PrefHomeFragment";
     public static final String PREF_HIDDEN_SECTIONS = "PrefHomeSectionsString";
-
     private static final String KEY_UP_ARROW = "up_arrow";
     private boolean displayUpArrow;
+    private AlertDialog settingsDialog = null;
     private HomeFragmentBinding viewBinding;
     private Disposable disposable;
 
@@ -144,10 +146,22 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
                 R.id.refresh_item, event.isFeedUpdateRunning);
     }
 
-    @Override
+    private AlertDialog openHomeSectionsSettingsDialog() {
+        return HomeSectionsSettingsDialog.open(
+                getContext(),
+                (dialogInterface, i) -> {
+                    settingsDialog = null;
+                    populateSectionList();
+                },
+                (dialogInterface, i) -> {
+                    settingsDialog = null;
+                }
+        );
+    }
+
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.homesettings_items) {
-            HomeSectionsSettingsDialog.open(getContext(), (dialogInterface, i) -> populateSectionList());
+            settingsDialog = openHomeSectionsSettingsDialog();
             return true;
         } else if (item.getItemId() == R.id.refresh_item) {
             FeedUpdateManager.runOnceOrAsk(requireContext());
@@ -196,4 +210,11 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
     }
 
+    @Override
+    public void handleConfigurationChanged() {
+        if (settingsDialog != null) {
+            settingsDialog.dismiss();
+            settingsDialog = openHomeSectionsSettingsDialog();
+        }
+    }
 }
